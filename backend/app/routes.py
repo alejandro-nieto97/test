@@ -42,6 +42,7 @@ def fetch_data():
             print("Client disconnected, stopping background task.")
 
     return Response(stream_with_context(generate(stop_event)), mimetype='text/event-stream', headers={'Cache-Control': 'no-cache'})
+    
 
 
 
