@@ -8,7 +8,7 @@ import json
 bp = Blueprint('routes', __name__)
 API_URL = 'http://localhost:3000/data?index={}'
 CONCURRENCY_LEVEL = 20  # Adjust based on your environment capabilities
-PAGES_TO_FETCH = 5000
+PAGES_TO_FETCH = 50
 
 def fetch_page(url):
     try:
@@ -42,7 +42,7 @@ def fetch_data():
             print("Client disconnected, stopping background task.")
 
     return Response(stream_with_context(generate(stop_event)), mimetype='text/event-stream', headers={'Cache-Control': 'no-cache'})
-    
+
 
 
 
