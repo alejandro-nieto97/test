@@ -1,2 +1,2 @@
-.env
+*.env
 backend/app/__pycache__/routes.cpython-312.pyc
