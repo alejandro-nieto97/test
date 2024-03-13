@@ -3,7 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import styles from './page.module.css';
 import io from 'socket.io-client';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://sea-lion-app-23rag.ondigitalocean.app/backend';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'wss://sea-lion-app-23rag.ondigitalocean.app/backend';
 console.log('API_URL:', API_URL);
 const socket = io(API_URL,  { path: '/backend/socket.io' });
 
