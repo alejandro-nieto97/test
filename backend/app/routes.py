@@ -6,10 +6,11 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 import json
 from . import socketio
 import os
+import time
 
 # API_URL = ''http://localhost:3000/data?index={}&channel={}''
 API_URL = os.environ.get('API_URL')
-CONCURRENCY_LEVEL = 20
+CONCURRENCY_LEVEL = 3
 PAGES_TO_FETCH = 5000
 
 stop_events = {}
@@ -25,20 +26,26 @@ def fetch_page(url, channel):
 
 def background_task(socket_id, channel, stop_event):
     urls = [API_URL.format(page, channel) for page in range(1, PAGES_TO_FETCH)]
+    requests_per_second = 10  # Define your rate limit
+    request_interval = 1.0 / requests_per_second
+    
     with ThreadPoolExecutor(max_workers=CONCURRENCY_LEVEL) as executor:
-        futures = [executor.submit(fetch_page, url, channel) for url in urls]
+        futures = []
+        for url in urls:
+            if stop_event.is_set():
+                break
+            future = executor.submit(fetch_page, url, channel)
+            futures.append(future)
+            time.sleep(request_interval)  # Wait to adhere to rate limit
         try:
             for future in as_completed(futures):
                 if stop_event.is_set():
                     print(f"Attempting to stop API calls for client: {socket_id}")
-                    for f in futures:
-                        f.cancel()
                     break
                 data = future.result() if not future.cancelled() else None
                 if data:
                     socketio.emit('data_chunk', json.dumps(data), to=socket_id)
         finally:
-            # Ensure all futures are cancelled if not completed
             for f in futures:
                 f.cancel()
 
