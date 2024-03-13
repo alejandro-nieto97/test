@@ -1,4 +1,3 @@
-# Assuming this is in your_blueprint_file.py or similar
 from flask_socketio import SocketIO
 import threading
 import requests
@@ -32,7 +31,6 @@ def background_task(socket_id, channel, stop_event):
             for future in as_completed(futures):
                 if stop_event.is_set():
                     print(f"Attempting to stop API calls for client: {socket_id}")
-                    # Attempt to cancel all futures
                     for f in futures:
                         f.cancel()
                     break
@@ -48,35 +46,30 @@ def background_task(socket_id, channel, stop_event):
 def handle_start_fetch(data):
     print("Client requested to start fetching data")
     channel = data.get('channel', 'general')
-    socket_id = request.sid  # Get the client's socket ID to send data directly to them
-    # Create a stop event for this background task and store it using the client's socket ID
+    socket_id = request.sid
     stop_event = threading.Event()
-    stop_events[socket_id] = stop_event  # Map the client's socket ID to its stop event
+    stop_events[socket_id] = stop_event
     threading.Thread(target=background_task, args=(socket_id, channel, stop_event)).start()
 
 @socketio.on('disconnect')
 def handle_disconnect():
-    socket_id = request.sid  # Get the disconnected client's socket ID
+    socket_id = request.sid
     print(f"Client disconnected: {socket_id}")
-    # Retrieve and signal the stop event for the disconnected client's background task
     stop_event = stop_events.pop(socket_id, None)
     if stop_event:
-        stop_event.set()  # Signal the background task to stop
+        stop_event.set()
 
 @socketio.on('change_channel')
 def handle_change_channel(data):
     print("Client requested to change channel")
     channel = data.get('channel', 'general')
-    socket_id = request.sid  # Get the client's socket ID
+    socket_id = request.sid
 
-    # Signal the current background task to stop
     stop_event = stop_events.get(socket_id)
     if stop_event:
         stop_event.set()
 
-    # Create a new stop event for the new background taskf
     new_stop_event = threading.Event()
-    stop_events[socket_id] = new_stop_event  # Update the mapping with the new stop event
+    stop_events[socket_id] = new_stop_event
 
-    # Start a new background task for the new channel
     threading.Thread(target=background_task, args=(socket_id, channel, new_stop_event)).start()

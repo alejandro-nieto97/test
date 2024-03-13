@@ -1,4 +1,4 @@
-"use client"; // This is a client component 👈🏽
+"use client";
 import React, { useState, useEffect, useRef } from 'react';
 import styles from './page.module.css';
 import io from 'socket.io-client';
@@ -10,10 +10,9 @@ const socket = io(API_URL, {path: '/backend/socket.io'});
 const IndexPage = () => {
   const [selectedChannel, setSelectedChannel] = useState('general');
   const [dataChunks, setDataChunks] = useState([]);
-  const selectedChannelRef = useRef(selectedChannel); // Use a ref to track the current channel
+  const selectedChannelRef = useRef(selectedChannel);
 
   useEffect(() => {
-    // Function to handle incoming data chunks
     const handleDataChunk = (data) => {
       console.log('Received event:', data);
       try {
@@ -24,16 +23,13 @@ const IndexPage = () => {
       }
     };
 
-    // Function to handle connection errors
     const handleConnectError = (error) => {
       console.error('WebSocket connection failed:', error);
     };
 
-    // Add listeners on mount
     socket.on('data_chunk', handleDataChunk);
     socket.on('connect_error', handleConnectError);
 
-    // Emit an event to start fetching data for the initial channel
     if (socket.connected) {
       socket.emit('start_fetch', { channel: selectedChannel });
     } else {
@@ -46,15 +42,14 @@ const IndexPage = () => {
       socket.off('data_chunk', handleDataChunk);
       socket.off('connect_error', handleConnectError);
     };
-  }, []); // Empty dependencies array ensures this effect runs only once on mount
+  }, []);
 
   useEffect(() => {
-    // Check if the channel has actually changed to prevent unnecessary emits
     if (selectedChannelRef.current !== selectedChannel) {
-      selectedChannelRef.current = selectedChannel; // Update ref to current channel
+      selectedChannelRef.current = selectedChannel;
       console.log(`Channel changed to: ${selectedChannel}`);
-      setDataChunks([]); // Clear the data chunks when the channel changes
-      socket.emit('change_channel', { channel: selectedChannel }); // Inform the server about the channel change
+      setDataChunks([]);
+      socket.emit('change_channel', { channel: selectedChannel });
     }
   }, [selectedChannel]); 
   
