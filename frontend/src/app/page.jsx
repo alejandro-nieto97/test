@@ -3,7 +3,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import styles from './page.module.css';
 import io from 'socket.io-client';
 
-const socket = io('http://localhost:5000');
+const API_URL = process.env.API_URL || 'https://test-backend-ecru.vercel.app/';
+const socket = io(API_URL);
 
 const IndexPage = () => {
   const [selectedChannel, setSelectedChannel] = useState('general');
