@@ -9,7 +9,7 @@ from . import socketio
 import os
 
 # API_URL = ''http://localhost:3000/data?index={}&channel={}''
-API_URL = os.environ.get('API_URL') | 
+API_URL = os.environ.get('API_URL')
 CONCURRENCY_LEVEL = 20
 PAGES_TO_FETCH = 5000
 
