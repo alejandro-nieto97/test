@@ -97,7 +97,7 @@ const IndexPage = () => {
       </div>
       <div className={styles.chatContainer}>
         <div className={styles.messages}>
-          {dataChunks.slice().reverse().map((msg, index) => (
+          {dataChunks.length > 0 && dataChunks.slice().reverse().map((msg, index) => (
             <div key={index} className={styles.message}>
               <div className={styles.messageHeader}>
                 <span className={styles.userName}>{msg.name}</span>
@@ -105,6 +105,34 @@ const IndexPage = () => {
               <p className={styles.messageBody}>{msg.bio}</p>
             </div>
           ))}
+          {!dataChunks.length &&
+            <>
+              <div className={styles.message}>
+                <p className={styles.messageBody}>
+                  <div className={styles.dots}><span>&bull;</span><span>&bull;</span><span>&bull;</span></div>
+                  <br />
+                </p>
+              </div>
+              <div className={styles.message}>
+                <p className={styles.messageBody}>
+                  <div className={styles.dots}><span>&bull;</span><span>&bull;</span><span>&bull;</span></div>
+                  <br />
+                </p>
+              </div>
+              <div className={styles.message}>
+                <p className={styles.messageBody}>
+                  <div className={styles.dots}><span>&bull;</span><span>&bull;</span><span>&bull;</span></div>
+                  <br />
+                </p>
+              </div>
+              <div className={styles.message}>
+                <p className={styles.messageBody}>
+                  <div className={styles.dots}><span>&bull;</span><span>&bull;</span><span>&bull;</span></div>
+                  <br />
+                </p>
+              </div>
+            </>
+          }
         </div>
       </div>
     </div>
