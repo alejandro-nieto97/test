@@ -1,0 +1,92 @@
+/* styles/Chat.module.css */
+.chatApp {
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 88px);
+  padding: 20px 50px 0px 50px;
+}
+
+.chatContainer {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.messages {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.message {
+  margin-bottom: 15px;
+  padding: 10px;
+  background: var(--gray-2);
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.messageHeader {
+  margin-bottom: 5px;
+  color: var(--font-color-light);
+  font-weight: bold;
+}
+
+.userName {
+  color: var(--font-color-light);
+}
+
+.messageBody {
+  margin: 0;
+  color: var(--font-color-light);
+  font-weight: 300;
+}
+
+.chatHeader {
+  display: flex;
+  justify-content: space-between;
+  padding: 20px;
+}
+
+.channels {
+  display: flex;
+  gap: 20px;
+}
+
+.resultsCount {
+  border: solid 1px var(--font-color-medium);
+  border-radius: 8px;
+  padding: 10px 12px 8px 12px;
+}
+
+.channelButton {
+  padding: 10px 20px;
+  background: var(--gray-2);
+  border: none;
+  border-radius: 8px;
+  color: var(--font-color-light);
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  transition: color 0.3s ease;
+}
+
+.channelButton:hover {
+  background: var(--gray-4);
+  color: var(--font-color-light);
+  font-weight: 600;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.selectedChannel {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  color: var(--font-color-light);
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  transition: color 0.3s ease;
+  background: var(--gray-4);
+  font-weight: 600;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
