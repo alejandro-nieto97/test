@@ -5,7 +5,7 @@ import io from 'socket.io-client';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://sea-lion-app-23rag.ondigitalocean.app/backend';
 console.log('API_URL:', API_URL);
-const socket = io(API_URL);
+const socket = io(API_URL,  { path: '/backend/socket.io' });
 
 const IndexPage = () => {
   const [selectedChannel, setSelectedChannel] = useState('general');
