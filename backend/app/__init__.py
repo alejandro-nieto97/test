@@ -12,6 +12,10 @@ def create_app():
     
     socketio.init_app(app)
     
+    @app.route('/')
+    def hello_world():
+        return 'Hello, World!'
+        
     # Import and register your socketio events here if they are in a different module
     from . import routes  # This ensures routes.py is imported and events registered
 
