@@ -4,3 +4,17 @@
   text-align: center;
   height: 88px;
 }
+
+@media (max-width: 1024px) {
+  .layoutHeader {
+    padding: 40px 0 0 0;
+    font-size: 16px;
+  }
+}
+
+@media (max-width: 350px) {
+  .layoutHeader {
+    padding: 40px 0 0 0;
+    font-size: 12px;
+  }
+}
