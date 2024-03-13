@@ -37,6 +37,7 @@ def background_task(socket_id, channel, stop_event):
                 data = future.result() if not future.cancelled() else None
                 if data:
                     socketio.emit('data_chunk', json.dumps(data), to=socket_id)
+
         finally:
             # Ensure all futures are cancelled if not completed
             for f in futures:

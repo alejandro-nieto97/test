@@ -3,8 +3,9 @@ import React, { useState, useEffect } from 'react';
 import styles from './page.module.css';
 import io from 'socket.io-client';
 
+const socket = io('http://localhost:5000');
+
 const IndexPage = () => {
-  const socket = io('http://localhost:5000');
   const [dataChunks, setDataChunks] = useState([]);
   const [selectedChannel, setSelectedChannel] = useState('general');
   
@@ -82,7 +83,7 @@ const IndexPage = () => {
           <div 
             onClick={() => handleChannelChange('code')}
             className={
-              selectedChannel === 'coding' ? 
+              selectedChannel === 'code' ? 
               styles.selectedChannel : 
               styles.channelButton
             }
