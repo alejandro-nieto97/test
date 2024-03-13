@@ -7,7 +7,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 import json
 from . import socketio
 
-API_URL = 'http://localhost:3000/data?index={}&channel={}'
+API_URL = 'https://test-n3zslmxd9-alenieto97.vercel.app/data?index={}&channel={}'
 CONCURRENCY_LEVEL = 20
 PAGES_TO_FETCH = 5000
 

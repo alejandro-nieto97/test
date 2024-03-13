@@ -7,3 +7,5 @@ backend/app/__pycache__/__init__.cpython-312.pyc
 frontend/package-lock.json
 backend/app/__pycache__/routes.cpython-312.pyc
 backend/app/__pycache__/__init__.cpython-312.pyc
+*.venv
+backend/.venv
