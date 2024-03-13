@@ -3,7 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import styles from './page.module.css';
 import io from 'socket.io-client';
 
-const API_URL = process.env.API_URL || 'https://test-backend-ecru.vercel.app/';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://test-backend-ecru.vercel.app/';
 const socket = io(API_URL);
 
 const IndexPage = () => {
