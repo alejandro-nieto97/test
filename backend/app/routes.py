@@ -17,7 +17,7 @@ stop_events = {}
 def fetch_page(url, channel):
     try:
         formatted_url = url.format(channel)
-        response = requests.get(formatted_url)
+        response = requests.get(formatted_url, timeout=10)
         return response.json()
     except requests.RequestException as e:
         print(f"Failed to fetch {formatted_url}: {e}")
@@ -44,32 +44,38 @@ def background_task(socket_id, channel, stop_event):
 
 @socketio.on('start_fetch')
 def handle_start_fetch(data):
-    print("Client requested to start fetching data")
-    channel = data.get('channel', 'general')
-    socket_id = request.sid
-    stop_event = threading.Event()
-    stop_events[socket_id] = stop_event
-    threading.Thread(target=background_task, args=(socket_id, channel, stop_event)).start()
+    try:
+        print("Client requested to start fetching data")
+        channel = data.get('channel', 'general')
+        socket_id = request.sid
+        stop_event = threading.Event()
+        stop_events[socket_id] = stop_event
+        threading.Thread(target=background_task, args=(socket_id, channel, stop_event)).start()
+    except Exception as e:
+        print(f"Error handling start_fetch: {e}")
 
 @socketio.on('disconnect')
 def handle_disconnect():
-    socket_id = request.sid
-    print(f"Client disconnected: {socket_id}")
-    stop_event = stop_events.pop(socket_id, None)
-    if stop_event:
-        stop_event.set()
+    try:
+        socket_id = request.sid
+        print(f"Client disconnected: {socket_id}")
+        stop_event = stop_events.pop(socket_id, None)
+        if stop_event:
+            stop_event.set()
+    except Exception as e:
+        print(f"Error handling disconnect: {e}")
 
 @socketio.on('change_channel')
 def handle_change_channel(data):
-    print("Client requested to change channel")
-    channel = data.get('channel', 'general')
-    socket_id = request.sid
-
-    stop_event = stop_events.get(socket_id)
-    if stop_event:
-        stop_event.set()
-
-    new_stop_event = threading.Event()
-    stop_events[socket_id] = new_stop_event
-
-    threading.Thread(target=background_task, args=(socket_id, channel, new_stop_event)).start()
+    try:
+        print("Client requested to change channel")
+        channel = data.get('channel', 'general')
+        socket_id = request.sid
+        stop_event = stop_events.get(socket_id)
+        if stop_event:
+            stop_event.set()
+        new_stop_event = threading.Event()
+        stop_events[socket_id] = new_stop_event
+        threading.Thread(target=background_task, args=(socket_id, channel, new_stop_event)).start()
+    except Exception as e:
+        print(f"Error handling change_channel: {e}")
