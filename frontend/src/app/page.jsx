@@ -1,40 +1,54 @@
 "use client"; // This is a client component 👈🏽
 import React, { useState, useEffect } from 'react';
 import styles from './page.module.css';
+import io from 'socket.io-client';
 
 const IndexPage = () => {
+  const socket = io('http://localhost:5000');
   const [dataChunks, setDataChunks] = useState([]);
   const [selectedChannel, setSelectedChannel] = useState('general');
-
+  
   useEffect(() => {
-    const fetchDataStream = async () => {
-        const eventSource = new EventSource(`http://localhost:5000/fetch_data?channel=${selectedChannel}`);
-
-        eventSource.onmessage = function(event) {
-            try {
-                // Remove the "data: " prefix and any leading/trailing whitespaces before parsing
-                const cleanData = event.data.replace(/^data: /, '').trim();
-                const jsonData = JSON.parse(cleanData);
-                // Update state with new data chunk
-                setDataChunks(prevChunks => [...prevChunks, jsonData]);
-            } catch (error) {
-                console.error('Error parsing JSON chunk', error);
-            }
-        };
-
-        eventSource.onerror = function(error) {
-            console.error('EventSource failed:', error);
-            eventSource.close();
-        };
-
-        // Clean up event source when component unmounts
-        return () => eventSource.close();
-    };
-
     setDataChunks([]);
-    fetchDataStream().catch(console.error);
-  }, [selectedChannel]);
 
+    // Listen for 'connect' event to ensure the connection is established
+    socket.on('connect', () => {
+      console.log(`Opening WebSocket for channel: ${selectedChannel}`);
+      // Emit an event to start fetching data for the selected channel
+      socket.emit('start_fetch', { channel: selectedChannel });
+    });
+
+    // Handle incoming data chunks
+    socket.on('data_chunk', (data) => {
+      console.log('Received event:', data);
+      try {
+        const jsonData = JSON.parse(data);
+
+        // Here, it assumes jsonData is directly usable. Adjust as necessary.
+        setDataChunks(prevChunks => [...prevChunks, jsonData]);
+
+      } catch (error) {
+        console.error('Error parsing JSON chunk', error);
+      }
+    });
+
+    // Handle potential errors
+    socket.on('connect_error', (error) => {
+      console.error('WebSocket connection failed:', error);
+    });
+
+    // Cleanup function to run when component unmounts or selectedChannel changes
+    return () => {
+      console.log('Cleanup: Closing WebSocket connection for channel:', selectedChannel);
+      // Remove event listeners to prevent memory leaks
+      socket.off('connect');
+      socket.off('data_chunk');
+      socket.off('connect_error');
+      
+      // No need to manually close the socket here since it's managed globally and might be used by other components/instances
+    };
+  }, [selectedChannel]); // Re-run this effect if selectedChannel changes
+  
   const handleChannelChange = (channel) => {
     setSelectedChannel(channel);
   }
@@ -66,7 +80,7 @@ const IndexPage = () => {
             Random
           </div>
           <div 
-            onClick={() => handleChannelChange('coding')}
+            onClick={() => handleChannelChange('code')}
             className={
               selectedChannel === 'coding' ? 
               styles.selectedChannel : 
