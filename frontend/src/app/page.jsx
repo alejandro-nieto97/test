@@ -1,54 +1,60 @@
 "use client"; // This is a client component 👈🏽
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import styles from './page.module.css';
 import io from 'socket.io-client';
 
 const socket = io('http://localhost:5000');
 
 const IndexPage = () => {
-  const [dataChunks, setDataChunks] = useState([]);
   const [selectedChannel, setSelectedChannel] = useState('general');
-  
+  const [dataChunks, setDataChunks] = useState([]);
+  const selectedChannelRef = useRef(selectedChannel); // Use a ref to track the current channel
+
   useEffect(() => {
-    setDataChunks([]);
-
-    // Listen for 'connect' event to ensure the connection is established
-    socket.on('connect', () => {
-      console.log(`Opening WebSocket for channel: ${selectedChannel}`);
-      // Emit an event to start fetching data for the selected channel
-      socket.emit('start_fetch', { channel: selectedChannel });
-    });
-
-    // Handle incoming data chunks
-    socket.on('data_chunk', (data) => {
+    // Function to handle incoming data chunks
+    const handleDataChunk = (data) => {
       console.log('Received event:', data);
       try {
         const jsonData = JSON.parse(data);
-
-        // Here, it assumes jsonData is directly usable. Adjust as necessary.
         setDataChunks(prevChunks => [...prevChunks, jsonData]);
-
       } catch (error) {
         console.error('Error parsing JSON chunk', error);
       }
-    });
-
-    // Handle potential errors
-    socket.on('connect_error', (error) => {
-      console.error('WebSocket connection failed:', error);
-    });
-
-    // Cleanup function to run when component unmounts or selectedChannel changes
-    return () => {
-      console.log('Cleanup: Closing WebSocket connection for channel:', selectedChannel);
-      // Remove event listeners to prevent memory leaks
-      socket.off('connect');
-      socket.off('data_chunk');
-      socket.off('connect_error');
-      
-      // No need to manually close the socket here since it's managed globally and might be used by other components/instances
     };
-  }, [selectedChannel]); // Re-run this effect if selectedChannel changes
+
+    // Function to handle connection errors
+    const handleConnectError = (error) => {
+      console.error('WebSocket connection failed:', error);
+    };
+
+    // Add listeners on mount
+    socket.on('data_chunk', handleDataChunk);
+    socket.on('connect_error', handleConnectError);
+
+    // Emit an event to start fetching data for the initial channel
+    if (socket.connected) {
+      socket.emit('start_fetch', { channel: selectedChannel });
+    } else {
+      socket.once('connect', () => socket.emit('start_fetch', { channel: selectedChannel }));
+    }
+
+    // Cleanup function to remove listeners
+    return () => {
+      socket.off('connect')
+      socket.off('data_chunk', handleDataChunk);
+      socket.off('connect_error', handleConnectError);
+    };
+  }, []); // Empty dependencies array ensures this effect runs only once on mount
+
+  useEffect(() => {
+    // Check if the channel has actually changed to prevent unnecessary emits
+    if (selectedChannelRef.current !== selectedChannel) {
+      selectedChannelRef.current = selectedChannel; // Update ref to current channel
+      console.log(`Channel changed to: ${selectedChannel}`);
+      setDataChunks([]); // Clear the data chunks when the channel changes
+      socket.emit('change_channel', { channel: selectedChannel }); // Inform the server about the channel change
+    }
+  }, [selectedChannel]); 
   
   const handleChannelChange = (channel) => {
     setSelectedChannel(channel);

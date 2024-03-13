@@ -5,7 +5,6 @@ const port = 3000;
 const general = require('./general.json');
 const random = require('./random.json');
 const code = require('./code.json');
-// The 'data' variable is not used since you already imported 'general' above.
 
 // Simulate asynchronous operation
 function asyncOperation(index, channel = 'general') {
@@ -34,7 +33,7 @@ app.get('/', (req, res) => {
 app.get('/data', async (req, res) => {
   let index = req.query.index || 0;
   let channel = req.query.channel || 'general';
-  console.log('index:', index);
+  console.log('index:', index, 'channel:', channel);
   const response = await asyncOperation(index, channel);
   res.send(response);
 });

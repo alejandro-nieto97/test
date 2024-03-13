@@ -37,7 +37,6 @@ def background_task(socket_id, channel, stop_event):
                 data = future.result() if not future.cancelled() else None
                 if data:
                     socketio.emit('data_chunk', json.dumps(data), to=socket_id)
-
         finally:
             # Ensure all futures are cancelled if not completed
             for f in futures:
@@ -61,3 +60,21 @@ def handle_disconnect():
     stop_event = stop_events.pop(socket_id, None)
     if stop_event:
         stop_event.set()  # Signal the background task to stop
+
+@socketio.on('change_channel')
+def handle_change_channel(data):
+    print("Client requested to change channel")
+    channel = data.get('channel', 'general')
+    socket_id = request.sid  # Get the client's socket ID
+
+    # Signal the current background task to stop
+    stop_event = stop_events.get(socket_id)
+    if stop_event:
+        stop_event.set()
+
+    # Create a new stop event for the new background taskf
+    new_stop_event = threading.Event()
+    stop_events[socket_id] = new_stop_event  # Update the mapping with the new stop event
+
+    # Start a new background task for the new channel
+    threading.Thread(target=background_task, args=(socket_id, channel, new_stop_event)).start()
