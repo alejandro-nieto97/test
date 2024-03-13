@@ -1,6 +1,6 @@
 const express = require('express');
 const app = express();
-const port = 3000;
+const PORT = process.env.PORT || 3000;
 
 const general = require('./general.json');
 const random = require('./random.json');
@@ -38,6 +38,6 @@ app.get('/data', async (req, res) => {
   res.send(response);
 });
 
-app.listen(port, () => {
-  console.log(`Example app listening at http://localhost:${port}`);
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
 });
