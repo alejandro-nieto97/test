@@ -58,11 +58,21 @@ def handle_start_fetch(data):
         print("Client requested to start fetching data")
         channel = data.get('channel', 'general')
         socket_id = request.sid
+
+        # Check if there's already a stop event for this socket_id (i.e., a task running)
+        existing_stop_event = stop_events.get(socket_id)
+        if existing_stop_event:
+            print(f"Existing task running for {socket_id}. Stopping it before starting a new one.")
+            existing_stop_event.set()
+            time.sleep(1)  # Give a little time for the existing task to recognize the stop event and terminate
+
+        # Now create a new stop event for the new task
         stop_event = threading.Event()
         stop_events[socket_id] = stop_event
         threading.Thread(target=background_task, args=(socket_id, channel, stop_event)).start()
     except Exception as e:
         print(f"Error handling start_fetch: {e}")
+
 
 @socketio.on('disconnect')
 def handle_disconnect():
