@@ -5,7 +5,7 @@ import io from 'socket.io-client';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'wss://sea-lion-app-23rag.ondigitalocean.app/backend';
 console.log('API_URL:', API_URL);
-const socket = io(API_URL, {path: '/backend/socket.io'});
+const socket = io(API_URL);
 
 const IndexPage = () => {
   const [selectedChannel, setSelectedChannel] = useState('general');
@@ -108,28 +108,28 @@ const IndexPage = () => {
           {!dataChunks.length &&
             <>
               <div className={styles.message}>
-                <p className={styles.messageBody}>
+                <div className={styles.messageBody}>
                   <div className={styles.dots}><span>&bull;</span><span>&bull;</span><span>&bull;</span></div>
                   <br />
-                </p>
+                </div>
               </div>
               <div className={styles.message}>
-                <p className={styles.messageBody}>
+                <div className={styles.messageBody}>
                   <div className={styles.dots}><span>&bull;</span><span>&bull;</span><span>&bull;</span></div>
                   <br />
-                </p>
+                </div>
               </div>
               <div className={styles.message}>
-                <p className={styles.messageBody}>
+                <div className={styles.messageBody}>
                   <div className={styles.dots}><span>&bull;</span><span>&bull;</span><span>&bull;</span></div>
                   <br />
-                </p>
+                </div>
               </div>
               <div className={styles.message}>
-                <p className={styles.messageBody}>
+                <div className={styles.messageBody}>
                   <div className={styles.dots}><span>&bull;</span><span>&bull;</span><span>&bull;</span></div>
                   <br />
-                </p>
+                </div>
               </div>
             </>
           }
