@@ -10,7 +10,7 @@ def create_app():
     cors = CORS(app)
     app.config['CORS_HEADERS'] = 'Content-Type'
     
-    socketio.init_app(app, path='/backend/socket.io')
+    socketio.init_app(app)
     
     @app.route('/')
     def hello_world():
