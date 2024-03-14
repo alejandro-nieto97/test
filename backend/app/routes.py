@@ -19,6 +19,7 @@ def fetch_page(url, channel):
     try:
         formatted_url = url.format(channel)
         response = requests.get(formatted_url, timeout=10)
+        print(f"Fetched {formatted_url}")
         return response.json()
     except requests.RequestException as e:
         print(f"Failed to fetch {formatted_url}: {e}")
@@ -34,6 +35,7 @@ def background_task(socket_id, channel, stop_event):
         for url in urls:
             if stop_event.is_set():
                 break
+            print(f"Submitting task for client: {socket_id}")
             future = executor.submit(fetch_page, url, channel)
             futures.append(future)
             time.sleep(request_interval)  # Wait to adhere to rate limit
@@ -44,6 +46,7 @@ def background_task(socket_id, channel, stop_event):
                     break
                 data = future.result() if not future.cancelled() else None
                 if data:
+                    print(f"Sending data to client: {socket_id}")
                     socketio.emit('data_chunk', json.dumps(data), to=socket_id)
         finally:
             for f in futures:
